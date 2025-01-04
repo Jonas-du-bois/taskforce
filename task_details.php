@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fichier de modification d'une tâche 
+ * -------------------------------------------
+ * Permet de à l'utilisateur connecté de modifier/supprimer une tâche (redirection de la page dashboard)
+ */
 require_once 'vendor/autoload.php';
 require_once 'includes/functions.php';
 // Lien vers le fichier de fonction pour le multilingue

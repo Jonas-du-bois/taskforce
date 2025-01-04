@@ -796,5 +796,52 @@ class DbManagerCRUD implements I_ApiCRUD
         throw new \Exception('Erreur lors de la recherche des tâches : ' . $e->getMessage());
     }
 }
+public function searchTasksSorted(
+    string $query, 
+    int $userId, 
+    string $sortColumn = 'dateEcheance', 
+    string $order = 'ASC'
+): array {
+    $allowedColumns = ['titre', 'dateEcheance', 'statut'];
+    if (!in_array($sortColumn, $allowedColumns)) {
+        $sortColumn = 'dateEcheance';
+    }
+
+    $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
+
+    try {
+        $sql = "
+            SELECT t.id, t.titre, t.description, t.dateEcheance, t.statut
+            FROM tasks t
+            INNER JOIN task_users tu ON t.id = tu.taskId
+            WHERE tu.userId = :userId
+              AND (t.titre LIKE :query OR t.description LIKE :query)
+            ORDER BY $sortColumn $order
+            LIMIT 50
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue(':query', '%' . $query . '%', \PDO::PARAM_STR);
+        $stmt->execute();
+
+        $tasks = [];
+        while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $tasks[] = new Task(
+                $taskData['titre'],
+                $taskData['description'],
+                [], 
+                $taskData['dateEcheance'],
+                $taskData['statut'],
+                $taskData['id']
+            );
+        }
+
+        return $tasks;
+    } catch (\PDOException $e) {
+        error_log('Erreur dans searchTasksSorted : ' . $e->getMessage());
+        throw new \Exception('Erreur lors de la recherche des tâches triées : ' . $e->getMessage());
+    }
+}
 
 }

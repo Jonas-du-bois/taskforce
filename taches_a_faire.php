@@ -1,4 +1,10 @@
 <?php
+/**
+ * Fichier des tâches à faire (taches_a_faire)
+ * -------------------------------------------
+ * Affiche et gère la liste des tâches marquées "À faire" pour l’utilisateur connecté.
+ */
+
 // Autoload des dépendances via Composer et inclusion des fonctions externes
 require_once 'vendor/autoload.php';  // Pour charger les dépendances via Composer
 require_once 'includes/functions.php'; // Pour inclure des fonctions personnalisées

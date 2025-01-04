@@ -28,8 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Activer l'écouteur sur le bouton seulement si la page est dashboard.php ou search_results.php
   if (
-    window.location.pathname.endsWith("dashboard.php") ||
-    window.location.pathname.endsWith("search_results.php")
+    window.location.pathname.endsWith("dashboard.php")
   ) {
     document
       .getElementById("searchButton")

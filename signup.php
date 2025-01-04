@@ -29,81 +29,148 @@ use M521\Taskforce\dbManager\Users;
             <div class="col-lg-6 col-md-8 col-sm-12">
                 <form action="signup.php" method="POST">
                     <div class="mb-3">
-                        <label for="firstname" class="form-label"><?php echo t('firstname'); ?><span class="text-danger"> *</span></label>
-                        <input type="text" id="firstname" name="firstname" class="form-control" required minlength="3" maxlength="20" placeholder="<?php echo t('firstname_placeholder'); ?>" value="<?php echo isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : ''; ?>">
+                        <label for="firstname" class="form-label">
+                            <?php echo t('firstname'); ?>
+                            <span class="text-danger"> *</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="firstname"
+                            name="firstname"
+                            class="form-control"
+                            required
+                            minlength="3"
+                            maxlength="20"
+                            placeholder="<?php echo t('firstname_placeholder'); ?>"
+                            value="<?php echo isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : ''; ?>">
                     </div>
 
                     <div class="mb-3">
-                        <label for="lastname" class="form-label"><?php echo t('lastname'); ?><span class="text-danger"> *</span></label>
-                        <input type="text" id="lastname" name="lastname" class="form-control" required minlength="3" maxlength="20" placeholder="<?php echo t('lastname_placeholder'); ?>" value="<?php echo isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : ''; ?>">
+                        <label for="lastname" class="form-label">
+                            <?php echo t('lastname'); ?>
+                            <span class="text-danger"> *</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="lastname"
+                            name="lastname"
+                            class="form-control"
+                            required
+                            minlength="3"
+                            maxlength="20"
+                            placeholder="<?php echo t('lastname_placeholder'); ?>"
+                            value="<?php echo isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : ''; ?>">
                     </div>
 
                     <div class="mb-3">
-                        <label for="email" class="form-label"><?php echo t('email'); ?><span class="text-danger"> *</span></label>
-                        <input type="email" id="email" name="email" class="form-control" required placeholder="<?php echo t('email_placeholder'); ?>" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                        <label for="email" class="form-label">
+                            <?php echo t('email'); ?>
+                            <span class="text-danger"> *</span>
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            required
+                            placeholder="<?php echo t('email_placeholder'); ?>"
+                            value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                     </div>
 
                     <div class="mb-3">
-                        <label for="phone" class="form-label"><?php echo t('phone'); ?><span class="text-danger"> *</span></label>
-                        <input type="tel" id="phone" name="phone" class="form-control" required placeholder="<?php echo t('phone_placeholder'); ?>" value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+                        <label for="phone" class="form-label">
+                            <?php echo t('phone'); ?>
+                            <span class="text-danger"> *</span>
+                        </label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            class="form-control"
+                            required
+                            placeholder="<?php echo t('phone_placeholder'); ?>"
+                            value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label"><?php echo t('password'); ?><span class="text-danger"> *</span></label>
-                        <input type="password" id="password" name="password" class="form-control" required minlength="8" placeholder="<?php echo t('password_placeholder'); ?>">
+                        <label for="password" class="form-label">
+                            <?php echo t('password'); ?>
+                            <span class="text-danger"> *</span>
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control"
+                            required
+                            minlength="8"
+                            placeholder="<?php echo t('password_placeholder'); ?>">
                     </div>
 
-                    <button type="submit" name="submit" class="btn btn-primary w-100"><?php echo t('submit_button'); ?></button>
+                    <button type="submit" name="submit" class="btn btn-primary w-100">
+                        <?php echo t('submit_button'); ?>
+                    </button>
                 </form>
 
                 <?php
-                $dbUser = new DbManagerCRUD();
-                $dbUser->creeTable();
+                // Instancier le gestionnaire de base de données
+                $dbManager = new DbManagerCRUD();
+                // Créer la table si elle n'existe pas
+                $dbManager->creeTable();
 
-                if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                    // Récupérer les données du formulaire
-                    $nom = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $prenom = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-                    $noTel = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
-                    $motDePasse = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
+                // Si le formulaire est soumis
+                if ($_SERVER["REQUEST_METHOD"] === "POST") {
+                    // Récupérer et filtrer les données du formulaire
+                    $lastName      = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_SPECIAL_CHARS);
+                    $firstName     = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_SPECIAL_CHARS);
+                    $userEmail     = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+                    $phoneNumber   = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
+                    $userPassword  = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
 
-                    // Validation des données
+                    // Tableau pour stocker d'éventuelles erreurs
                     $errors = [];
 
-                    // Validation du prénom, nom, téléphone, email, et mot de passe
-                    if (!preg_match("/^[a-zA-ZÀ-ÿ' -]{3,20}$/", $prenom)) {
+                    // Validation du prénom
+                    if (!preg_match("/^[a-zA-ZÀ-ÿ' -]{3,20}$/", $firstName)) {
                         $errors[] = t('firstname_error');
                     }
-                    if (!preg_match("/^[a-zA-ZÀ-ÿ' -]{3,20}$/", $nom)) {
+
+                    // Validation du nom
+                    if (!preg_match("/^[a-zA-ZÀ-ÿ' -]{3,20}$/", $lastName)) {
                         $errors[] = t('lastname_error');
                     }
-                    if (!$email) {
+
+                    // Validation de l'email
+                    if (!$userEmail) {
                         $errors[] = t('email_error');
                     }
-                    if (!preg_match("/^\+?[0-9]{10,15}$/", $noTel)) {
+
+                    // Validation du téléphone
+                    if (!preg_match("/^\+?[0-9]{10,15}$/", $phoneNumber)) {
                         $errors[] = t('phone_error');
                     }
-                    if (!preg_match("/^(?=.*[A-Z])(?=.*[\W_])(?=.{8,})/", $motDePasse)) {
+
+                    // Validation du mot de passe (8+ caractères, 1 majuscule, 1 caractère spécial...)
+                    if (!preg_match("/^(?=.*[A-Z])(?=.*[\W_])(?=.{8,})/", $userPassword)) {
                         $errors[] = t('password_error');
                     }
 
-                    // Afficher les erreurs
+                    // Afficher les erreurs s'il y en a
                     if (!empty($errors)) {
                         foreach ($errors as $error) {
                             echo "<p style='color: red;'>$error</p>";
                         }
                     } else {
-                        // Si toutes les validations passent, traiter les données
-                        $newUser = new Users($prenom, $nom, $email, $noTel, $motDePasse);
-                        $token = $newUser->rendToken();
+                        // Si tout est valide, on crée un nouvel utilisateur
+                        $newUser = new Users($firstName, $lastName, $userEmail, $phoneNumber, $userPassword);
+                        $token   = $newUser->rendToken(); // Le token pour validation
 
                         try {
                             // Ajouter l'utilisateur dans la base de données
-                            $id = $dbUser->ajoutePersonne($newUser);
+                            $insertedUserId = $dbManager->ajoutePersonne($newUser);
 
-                            // Envoi du mail de confirmation
-                            sendConfirmationEmail($prenom, $email, $token);
+                            // Envoyer l'email de confirmation
+                            sendConfirmationEmail($firstName, $userEmail, $token);
 
                             echo "<p style='color: green;'>" . t('success_message') . "</p>";
                         } catch (PDOException $e) {

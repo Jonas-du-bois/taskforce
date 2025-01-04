@@ -100,7 +100,7 @@ if ($email === 'jonas.du.bois@outlook.com') {
     <!-- Spotlight -->
     <div class="overlay" id="overlay" aria-hidden="true"></div>
     <div class="spotlight" id="spotlight" role="dialog" aria-label="Recherche rapide">
-        <form action="search_results.php" method="GET">
+        <form action="dashboard.php" method="GET">
             <input type="search" name="query" placeholder="Tapez pour rechercher..." aria-label="Recherche" autofocus />
         </form>
     </div>

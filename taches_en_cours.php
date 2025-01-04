@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fichier des tâches en cours (taches_en_cours)
+ * -------------------------------------------
+ * Affiche et gère la liste des tâches marquées "En cours" pour l’utilisateur connecté.
+ */
 require_once 'vendor/autoload.php';
 require_once 'includes/functions.php';
 // Lien vers le fichier de fonction pour le multilingue

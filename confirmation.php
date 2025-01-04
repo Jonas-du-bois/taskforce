@@ -26,7 +26,7 @@ $dbUser = new DbManagerCRUD();
         <div class="card shadow-lg p-4" style="width: 400px;">
             <?php
             // Récupération et validation sécurisée du token depuis l'URL
-            $token = filter_input(INPUT_GET, 'token', FILTER_SANITIZE_STRING);
+            $token = filter_input(INPUT_GET, 'token');
 
             if ($token && preg_match('/^[a-zA-Z0-9]{32}$/', $token)) {
                 // Vérification de l'utilisateur correspondant au token

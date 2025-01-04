@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fichier des tâches terminées (taches_terminees)
+ * -------------------------------------------
+ * Affiche et gère la liste des tâches marquées "Terminée" pour l’utilisateur connecté.
+ */
 require_once 'vendor/autoload.php';
 require_once 'includes/functions.php';
 // Lien vers le fichier de fonction pour le multilingue

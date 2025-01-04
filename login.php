@@ -1,4 +1,12 @@
 <?php
+/**
+ * Page de connexion (login)
+ * -------------------------
+ * Gère le formulaire et la logique d’authentification d’un utilisateur.
+ * Vérifie ses identifiants, démarre la session correspondante et redirige vers la page principale
+ * en cas de succès. Affiche un message d’erreur en cas d’échec.
+ */
+
 // Inclusion de l'autoload pour charger les dépendances via Composer
 require_once 'vendor\autoload.php';
 

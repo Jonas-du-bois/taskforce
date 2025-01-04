@@ -1,4 +1,10 @@
 <?php
+/*
+ * Page du profil utilisateur
+ * -------------------------
+ * Cette page permet à un utilisateur connecté de consulter et modifier ses informations personnelles
+ * (prénom, nom, email, numéro de téléphone, mot de passe). 
+ */
 
 require_once 'vendor/autoload.php';
 
@@ -31,20 +37,23 @@ $dbManager = new DbManagerCRUD();
         $userEmail = $_SESSION['email_user'];
 
         // Récupération des informations de l'utilisateur à partir de la base de données
-        $userInfoArray = $dbManager->rendPersonnes($userEmail);
-        if (empty($userInfoArray)) {
+        $userArray = $dbManager->rendPersonnes($userEmail);
+        if (empty($userArray)) {
             die(t('user_not_found')); // Si l'utilisateur n'est pas trouvé, on arrête l'exécution
         }
 
         // L'utilisateur est unique, récupération de ses informations
-        $userInfo = $userInfoArray[0];
+        $userInfo = $userArray[0];
 
         // Définition des expressions régulières pour valider les champs
-        $namePattern = "/^[a-zA-ZÀ-ÿ' -]{3,20}$/";  // Prénom et Nom : 3 à 20 caractères, lettres et espaces
-        $telPattern = "/^\+?[0-9]{10,15}$/";  // Téléphone : 10 à 15 chiffres (format international ou local)
-        $passwordPattern = "/^(?=.*[A-Z])(?=.*[\W_])(?=.{8,})/";  // Mot de passe : minimum 8 caractères, une majuscule et un caractère spécial
+        $nameRegex = "/^[a-zA-ZÀ-ÿ' -]{3,20}$/";  
+        // 3 à 20 caractères, lettres, espaces, apostrophes, tirets
+        $phoneRegex = "/^\+?[0-9]{10,15}$/";  
+        // Téléphone : 10 à 15 chiffres (format international ou local)
+        $passwordRegex = "/^(?=.*[A-Z])(?=.*[\W_])(?=.{8,})/";
+        // Mot de passe : min. 8 caractères, 1 majuscule et 1 caractère spécial
 
-        // Initialisation des erreurs
+        // Tableau pour collecter les erreurs
         $errors = [];
         ?>
 
@@ -57,23 +66,57 @@ $dbManager = new DbManagerCRUD();
                     <form method="POST" action="">
                         <div class="mb-3">
                             <label for="prenom" class="form-label"><?= t('first_name'); ?></label>
-                            <input type="text" class="form-control" id="prenom" name="prenom" value="<?= htmlspecialchars($userInfo->rendPrenom()) ?>" required>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="prenom" 
+                                name="prenom" 
+                                value="<?= htmlspecialchars($userInfo->rendPrenom()) ?>" 
+                                required
+                            >
                         </div>
                         <div class="mb-3">
                             <label for="nom" class="form-label"><?= t('last_name'); ?></label>
-                            <input type="text" class="form-control" id="nom" name="nom" value="<?= htmlspecialchars($userInfo->rendNom()) ?>" required>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="nom" 
+                                name="nom" 
+                                value="<?= htmlspecialchars($userInfo->rendNom()) ?>" 
+                                required
+                            >
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label"><?= t('email'); ?></label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($userInfo->rendEmail()) ?>" required>
+                            <input 
+                                type="email" 
+                                class="form-control" 
+                                id="email" 
+                                name="email" 
+                                value="<?= htmlspecialchars($userInfo->rendEmail()) ?>" 
+                                required
+                            >
                         </div>
                         <div class="mb-3">
                             <label for="noTel" class="form-label"><?= t('phone_number'); ?></label>
-                            <input type="tel" class="form-control" id="noTel" name="noTel" value="<?= htmlspecialchars($userInfo->rendNoTel()) ?>" required>
+                            <input 
+                                type="tel" 
+                                class="form-control" 
+                                id="noTel" 
+                                name="noTel" 
+                                value="<?= htmlspecialchars($userInfo->rendNoTel()) ?>" 
+                                required
+                            >
                         </div>
                         <div class="mb-3">
                             <label for="motDePasse" class="form-label"><?= t('password'); ?></label>
-                            <input type="password" class="form-control" id="motDePasse" name="motDePasse">
+                            <input 
+                                type="password" 
+                                class="form-control" 
+                                id="motDePasse" 
+                                name="motDePasse"
+                                placeholder="<?= t('password_placeholder'); ?>"
+                            >
                         </div>
                         <button type="submit" class="btn btn-primary"><?= t('update_button'); ?></button>
                     </form>
@@ -82,64 +125,84 @@ $dbManager = new DbManagerCRUD();
                     // Traitement du formulaire
                     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         try {
-                            $prenom = htmlspecialchars(trim($_POST['prenom']));
-                            $nom = htmlspecialchars(trim($_POST['nom']));
-                            $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+                            // Sécurisation / conversion des champs
+                            $firstName = htmlspecialchars(trim($_POST['prenom']));
+                            $lastName  = htmlspecialchars(trim($_POST['nom']));
+                            $email     = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
 
                             if (!$email) {
                                 $errors[] = t('invalid_email');
                             }
-
-                            if (!preg_match($namePattern, $prenom)) {
+                            if (!preg_match($nameRegex, $firstName)) {
                                 $errors[] = t('invalid_first_name');
                             }
-
-                            if (!preg_match($namePattern, $nom)) {
+                            if (!preg_match($nameRegex, $lastName)) {
                                 $errors[] = t('invalid_last_name');
                             }
 
-                            $noTel = preg_match($telPattern, $_POST['noTel']) ? trim($_POST['noTel']) : null;
-                            if (!$noTel) {
+                            // Vérification du téléphone
+                            $phone = preg_match($phoneRegex, $_POST['noTel']) ? trim($_POST['noTel']) : null;
+                            if (!$phone) {
                                 $errors[] = t('invalid_phone');
                             }
 
-                            $motDePasse = !empty($_POST['motDePasse']) ? trim($_POST['motDePasse']) : '';
-                            if ($motDePasse && !preg_match($passwordPattern, $motDePasse)) {
+                            // Vérification du mot de passe (optionnel si pas rempli)
+                            $password = !empty($_POST['motDePasse']) ? trim($_POST['motDePasse']) : '';
+                            if ($password && !preg_match($passwordRegex, $password)) {
                                 $errors[] = t('invalid_password');
                             }
 
+                            // Afficher les erreurs s'il y en a
                             if (!empty($errors)) {
                                 foreach ($errors as $error) {
                                     echo "<p style='color: red;'>$error</p>";
                                 }
                             } else {
-                                $motDePasseHash = !empty($motDePasse) ? password_hash($motDePasse, PASSWORD_DEFAULT) : $userInfo->rendMotDePasse();
+                                // Mise à jour en BDD
+                                $passwordHash = (!empty($password)) 
+                                    ? password_hash($password, PASSWORD_DEFAULT)
+                                    : $userInfo->rendMotDePasse();
+
+                                // Création d'une instance Users pour la mise à jour
                                 $updatedUser = new Users(
-                                    $prenom,
-                                    $nom,
+                                    $firstName,
+                                    $lastName,
                                     $email,
-                                    $noTel,
-                                    $motDePasseHash,
-                                    $userInfo->rendId()
+                                    $phone,
+                                    $passwordHash,
+                                    $userInfo->rendId() // On conserve l'ID existant
                                 );
 
                                 $dbManager->modifiePersonne($userInfo->rendId(), $updatedUser);
 
+                                // Mise à jour de la session si l'email change
                                 $_SESSION['email_user'] = $email;
 
-                                $userInfoArray = $dbManager->rendPersonnes($email);
-                                $userInfo = $userInfoArray[0];
+                                // Récupérer les dernières infos depuis la BDD
+                                $userArray = $dbManager->rendPersonnes($email);
+                                $userInfo  = $userArray[0];
 
-                                $message = ['type' => 'success', 'text' => t('profile_updated')];
+                                $message = [
+                                    'type' => 'success', 
+                                    'text' => t('profile_updated')
+                                ];
                             }
                         } catch (Exception $e) {
+                            // Gestion d'erreurs SQL / uniques
                             if ($e->getCode() == 23000) {
-                                $message = ['type' => 'danger', 'text' => t('unique_violation')];
+                                $message = [
+                                    'type' => 'danger', 
+                                    'text' => t('unique_violation')
+                                ];
                             } else {
-                                $message = ['type' => 'danger', 'text' => t('unexpected_error') . $e->getMessage()];
+                                $message = [
+                                    'type' => 'danger', 
+                                    'text' => t('unexpected_error') . $e->getMessage()
+                                ];
                             }
                         }
 
+                        // Rafraîchit la page après 2 secondes
                         header("Refresh:2");
                     }
                     ?>

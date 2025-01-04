@@ -1,4 +1,9 @@
 <?php
+/**
+ * Fichier des tâches partagées (taches_partage)
+ * -------------------------------------------
+ * Affiche et gère la liste des tâches partagées entre plusieurs utilisateurs y compris l’utilisateur connecté.
+ */
 require_once 'vendor/autoload.php';
 require_once 'includes/functions.php';
 // Lien vers le fichier de fonction pour le multilingue
