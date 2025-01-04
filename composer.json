@@ -1,0 +1,15 @@
+{
+    "name": "m521/taskforce",
+    "description": "task manager",
+    "autoload": {
+        "psr-4": {
+            "M521\\Taskforce\\": ["src/", "src/dbManager/", "src/config/", "includes/", "Includes/", "lang" ]
+        }
+    },
+    "authors": [
+        {
+            "name": "JDB"
+        }
+    ],
+    "require": {}
+}

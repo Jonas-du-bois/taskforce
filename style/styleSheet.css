@@ -1,0 +1,10 @@
+/* Ajoutez ces styles dans votre fichier CSS 
+body {
+    opacity: 0;  Masquer le contenu par défaut 
+    transition: opacity 0.8s ease-in-out;  /* Appliquer une transition sur l'opacité 
+}
+
+body.loaded {
+    opacity: 1;  /* Afficher le contenu après la transition 
+}
+*/
