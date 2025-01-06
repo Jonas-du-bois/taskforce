@@ -17,7 +17,7 @@ if (!isset($_SESSION['user_connected']) || !$_SESSION['user_connected'] || $_SES
 $dbManager = new DbManagerCRUD();
 
 // Fetch all users from the database
-$utilisateurs = $dbManager->rendAllUtilisateur();
+$utilisateurs = $dbManager->getAllUsers();
 ?>
 
 <!DOCTYPE html>

@@ -167,7 +167,7 @@ use M521\Taskforce\dbManager\Users;
 
                         try {
                             // Ajouter l'utilisateur dans la base de données
-                            $insertedUserId = $dbManager->ajoutePersonne($newUser);
+                            $insertedUserId = $dbManager->addUser($newUser);
 
                             // Envoyer l'email de confirmation
                             sendConfirmationEmail($firstName, $userEmail, $token);

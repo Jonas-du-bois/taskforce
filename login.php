@@ -41,7 +41,7 @@ $dbUser = new DbManagerCRUD();
                 <!-- Affichage du nombre d'utilisateurs inscrits -->
                 <div class="alert alert-info text-center">
                     <p>
-                        <?php echo $dbUser->compterNbUsers(); ?> <?php echo t('user_count_message'); ?>
+                        <?php echo $dbUser->countUsers(); ?> <?php echo t('user_count_message'); ?>
                         <br><strong><?php echo t('user_count_congratulations'); ?></strong>
                     </p>
                 </div>
@@ -82,7 +82,7 @@ $dbUser = new DbManagerCRUD();
                         // Vérification de la validité des données
                         if ($email && strlen($motDePasse) >= 8) {
                             // Vérification des identifiants dans la base de données
-                            $loginStatus = $dbUser->verifierIdentifiants($email, $motDePasse);
+                            $loginStatus = $dbUser->verifyCredentials($email, $motDePasse);
 
                             // Affichage des messages en fonction du statut de la connexion
                             if ($loginStatus === 'success') {

@@ -9,8 +9,8 @@
  * @return object|null L'objet utilisateur trouvé, ou null si aucun utilisateur n'est trouvé.
  */
 function getUserByEmail($email, $dbManager) {
-    // Appel à la méthode rendPersonnes pour obtenir un tableau d'utilisateurs correspondant à l'email
-    $userInfoArray = $dbManager->rendPersonnes($email);
+    // Appel à la méthode getUser pour obtenir un tableau d'utilisateurs correspondant à l'email
+    $userInfoArray = $dbManager->getUser($email);
     
     // Si le tableau est non vide, on retourne le premier utilisateur, sinon on retourne null
     return !empty($userInfoArray) ? $userInfoArray[0] : null;

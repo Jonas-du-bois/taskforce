@@ -30,7 +30,7 @@ if (!$userInfo) {
 $userId = $userInfo->rendId();
 
 // Récupération de tous les utilisateurs pour le champ de sélection multiple
-$allUsers = $dbManager->rendAllUtilisateur();
+$allUsers = $dbManager->getAllUsers();
 
 // Traitement du formulaire d'ajout de tâche
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

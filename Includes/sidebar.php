@@ -28,7 +28,7 @@ if (empty($_SESSION['user_connected']) || !$_SESSION['user_connected']) {
 // Récupération des données utilisateur
 $email = $_SESSION['email_user'] ?? null;
 $dbManager = new DbManagerCRUD();
-$users = $dbManager->rendPersonnes($email);
+$users = $dbManager->getUser($email);
 $userName = !empty($users) ? htmlspecialchars($users[0]->rendPrenom() . ' ' . $users[0]->rendNom()) : 'Utilisateur inconnu';
 
 // Définition des liens de navigation

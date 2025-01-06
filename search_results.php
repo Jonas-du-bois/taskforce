@@ -1,3 +1,5 @@
+Page inutile
+
 <?php
 
 require_once 'vendor/autoload.php'; // Charger les classes via Composer

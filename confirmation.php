@@ -34,7 +34,7 @@ $dbUser = new DbManagerCRUD();
 
                 if ($user) {
                     // Confirmer l'inscription pour l'utilisateur
-                    if ($dbUser->confirmeInscription($user['id'])) {
+                    if ($dbUser->confirmRegistration($user['id'])) {
                         echo "<p class='alert alert-success'>Votre inscription a été confirmée avec succès !</p>";
                     } else {
                         echo "<p class='alert alert-danger'>Une erreur est survenue lors de la confirmation. Veuillez réessayer plus tard.</p>";

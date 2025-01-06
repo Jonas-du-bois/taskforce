@@ -37,7 +37,7 @@ $dbManager = new DbManagerCRUD();
         $userEmail = $_SESSION['email_user'];
 
         // Récupération des informations de l'utilisateur à partir de la base de données
-        $userArray = $dbManager->rendPersonnes($userEmail);
+        $userArray = $dbManager->getUser($userEmail);
         if (empty($userArray)) {
             die(t('user_not_found')); // Si l'utilisateur n'est pas trouvé, on arrête l'exécution
         }
@@ -173,13 +173,13 @@ $dbManager = new DbManagerCRUD();
                                     $userInfo->rendId() // On conserve l'ID existant
                                 );
 
-                                $dbManager->modifiePersonne($userInfo->rendId(), $updatedUser);
+                                $dbManager->updateUser($userInfo->rendId(), $updatedUser);
 
                                 // Mise à jour de la session si l'email change
                                 $_SESSION['email_user'] = $email;
 
                                 // Récupérer les dernières infos depuis la BDD
-                                $userArray = $dbManager->rendPersonnes($email);
+                                $userArray = $dbManager->getUser($email);
                                 $userInfo  = $userArray[0];
 
                                 $message = [

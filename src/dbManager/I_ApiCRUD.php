@@ -12,14 +12,14 @@ interface I_ApiCRUD {
      * @param Users $users Instance de la classe Users à insérer.
      * @return int Identifiant de l'utilisateur inséré.
      */
-    public function ajoutePersonne(Users $users): int;
+    public function addUser(Users $users): int;
 
     /**
      * Retourne une liste d'utilisateurs filtrée par nom.
      * @param string $nom Nom à rechercher.
      * @return array Tableau des utilisateurs correspondant.
      */
-    public function rendPersonnes(string $nom): array;
+    public function getUser(string $nom): array;
 
     /**
      * Modifie les données d'un utilisateur spécifique.
@@ -27,14 +27,14 @@ interface I_ApiCRUD {
      * @param Users $users Instance contenant les nouvelles données.
      * @return bool Retourne true si la modification a réussi, sinon false.
      */
-    public function modifiePersonne(int $id, Users $user): bool;
+    public function updateUser(int $id, Users $user): bool;
 
     /**
      * Supprime un utilisateur.
      * @param int $id Identifiant de l'utilisateur.
      * @return bool Retourne true si la suppression a réussi, sinon false.
      */
-    public function supprimePersonne(int $id): bool;
+    public function deleteUser(int $id): bool;
 
     /**
      * Vérifie si les identifiants d'un utilisateur sont valides.
@@ -42,13 +42,13 @@ interface I_ApiCRUD {
      * @param string $motDePasse Mot de passe de l'utilisateur.
      * @return string Retourne un token si les identifiants sont valides.
      */
-    public function verifierIdentifiants(string $email, string $motDePasse): string;
+    public function verifyCredentials(string $email, string $motDePasse): string;
 
     /**
      * Compte le nombre total d'utilisateurs.
      * @return int Nombre d'utilisateurs.
      */
-    public function compterNbUsers(): int;
+    public function countUsers(): int;
 
     /**
      * Récupère un utilisateur par son token d'authentification.
@@ -62,7 +62,7 @@ interface I_ApiCRUD {
      * @param int $userId Identifiant de l'utilisateur.
      * @return bool Retourne true si la confirmation a réussi, sinon false.
      */
-    public function confirmeInscription(int $userId): bool;
+    public function confirmRegistration(int $userId): bool;
 
     //----------Tasks----------
 

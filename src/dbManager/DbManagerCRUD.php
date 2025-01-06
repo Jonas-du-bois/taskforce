@@ -72,7 +72,7 @@ class DbManagerCRUD implements I_ApiCRUD
 
     // ---------- Méthodes pour les utilisateurs ----------
 
-    public function ajoutePersonne(Users $user): int
+    public function addUser(Users $user): int
     {
         $datas = [
             'nom' => $user->rendNom(),
@@ -89,7 +89,7 @@ class DbManagerCRUD implements I_ApiCRUD
     }
 
 
-    public function modifiePersonne(int $id, Users $user): bool
+    public function updateUser(int $id, Users $user): bool
     {
         $motDePasse = $user->rendMotDePasse();
 
@@ -111,7 +111,7 @@ class DbManagerCRUD implements I_ApiCRUD
         return true;
     }
 
-    public function rendPersonnes(string $email): array
+    public function getUser(string $email): array
     {
         $sql = "SELECT * FROM users WHERE email = :email;";
         $stmt = $this->db->prepare($sql);
@@ -173,7 +173,7 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
-    public function rendAllUtilisateur(): array
+    public function getAllUsers(): array
     {
         $sql = "SELECT * FROM users";
         $stmt = $this->db->prepare($sql);
@@ -196,7 +196,7 @@ class DbManagerCRUD implements I_ApiCRUD
         return $tabUsers;
     }
 
-    public function supprimePersonne(int $id): bool
+    public function deleteUser(int $id): bool
     {
         $sql = "DELETE FROM users WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -205,7 +205,7 @@ class DbManagerCRUD implements I_ApiCRUD
         return $stmt->rowCount() > 0;
     }
 
-    public function verifierIdentifiants(string $email, string $motDePasse): string
+    public function verifyCredentials(string $email, string $motDePasse): string
     {
         $sql = "SELECT motDePasse, is_confirmed FROM users WHERE email = :email";
         $stmt = $this->db->prepare($sql);
@@ -228,7 +228,7 @@ class DbManagerCRUD implements I_ApiCRUD
         return 'email_not_found';
     }
 
-    public function compterNbUsers(): int
+    public function countUsers(): int
     {
         $countQuery = "SELECT COUNT(*) as total_users FROM users";
         try {
@@ -252,7 +252,7 @@ class DbManagerCRUD implements I_ApiCRUD
         return $result ?: null; // Retourne null si $result est false
     }
 
-    public function confirmeInscription(int $userId): bool
+    public function confirmRegistration(int $userId): bool
     {
         $sql = "UPDATE users SET is_confirmed = 1, token = NULL WHERE id = :id";
         $stmt = $this->db->prepare($sql);
@@ -517,6 +517,13 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
+    /**
+     * Récupère toutes les tâches associées à un utilisateur donné.
+     *
+     * @param int $userId L'ID de l'utilisateur.
+     * @return Task[] Tableau d'objets Task.
+     * @throws \Exception En cas d'erreur lors de la récupération des tâches.
+     */
     public function getTasksByUserId(int $userId): array
     {
         try {
@@ -558,6 +565,14 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
+    /**
+     * Récupère les tâches associées à un utilisateur selon leur statut.
+     *
+     * @param int $userId L'ID de l'utilisateur.
+     * @param string $status Le statut des tâches (à faire, en cours, terminé).
+     * @return Task[] Tableau d'objets Task.
+     * @throws \Exception En cas d'erreur lors de la récupération des tâches.
+     */
     public function getTasksByUserIdAndStatus($userId, $status)
     {
         try {
@@ -600,10 +615,17 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
+    /**
+     * Récupère les tâches partagées d'un utilisateur.
+     *
+     * @param int $userId L'ID de l'utilisateur.
+     * @return array Tableau contenant les informations des tâches partagées.
+     * @throws \Exception En cas d'erreur lors de la récupération des tâches.
+     */
     public function getTasksSharedByUserId(int $userId): array
-{
-    try {
-        $stmt = $this->db->prepare("
+    {
+        try {
+            $stmt = $this->db->prepare("
             SELECT 
                 t.*, 
                 GROUP_CONCAT(u.email) AS shared_user_names
@@ -623,28 +645,28 @@ class DbManagerCRUD implements I_ApiCRUD
             )
             GROUP BY t.id
         ");
-        $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
-        $stmt->execute();
+            $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
+            $stmt->execute();
 
-        $tasks = [];
+            $tasks = [];
 
-        while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $tasks[] = [
-                'id' => $taskData['id'], // ID de la tâche ajouté ici
-                'titre' => $taskData['titre'],
-                'description' => $taskData['description'],
-                'dateEcheance' => $taskData['dateEcheance'],
-                'statut' => $taskData['statut'],
-                'shared_user_names' => $taskData['shared_user_names'],
-            ];
+            while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $tasks[] = [
+                    'id' => $taskData['id'], // ID de la tâche ajouté ici
+                    'titre' => $taskData['titre'],
+                    'description' => $taskData['description'],
+                    'dateEcheance' => $taskData['dateEcheance'],
+                    'statut' => $taskData['statut'],
+                    'shared_user_names' => $taskData['shared_user_names'],
+                ];
+            }
+
+            return $tasks;
+        } catch (\PDOException $e) {
+            error_log('Erreur dans getTasksSharedByUserId : ' . $e->getMessage());
+            throw new \Exception('Erreur lors de la récupération des tâches partagées : ' . $e->getMessage());
         }
-
-        return $tasks;
-    } catch (\PDOException $e) {
-        error_log('Erreur dans getTasksSharedByUserId : ' . $e->getMessage());
-        throw new \Exception('Erreur lors de la récupération des tâches partagées : ' . $e->getMessage());
     }
-}
 
 
     public function getTasksByUserIdSorted(int $userId, string $sortColumn = 'titre', string $order = 'ASC'): array
@@ -762,9 +784,9 @@ class DbManagerCRUD implements I_ApiCRUD
     }
 
     public function searchTasks(string $query, $userId): array
-{
-    try {
-        $stmt = $this->db->prepare('
+    {
+        try {
+            $stmt = $this->db->prepare('
             SELECT t.id, t.titre, t.description, t.dateEcheance, t.statut
             FROM tasks t
             INNER JOIN task_users tu ON t.id = tu.taskId
@@ -773,44 +795,44 @@ class DbManagerCRUD implements I_ApiCRUD
             ORDER BY t.dateEcheance ASC
             LIMIT 50
         ');
-        $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
-        $stmt->bindValue(':query', "%$query%", \PDO::PARAM_STR);
-        $stmt->execute();
+            $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
+            $stmt->bindValue(':query', "%$query%", \PDO::PARAM_STR);
+            $stmt->execute();
 
-        $tasks = [];
-        while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $tasks[] = new Task(
-                $taskData['titre'],
-                $taskData['description'],
-                [], 
-                $taskData['dateEcheance'],
-                $taskData['statut'],
-                $taskData['id']
-            );
+            $tasks = [];
+            while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $tasks[] = new Task(
+                    $taskData['titre'],
+                    $taskData['description'],
+                    [],
+                    $taskData['dateEcheance'],
+                    $taskData['statut'],
+                    $taskData['id']
+                );
+            }
+
+            return $tasks;
+        } catch (\PDOException $e) {
+            error_log('Erreur dans searchTasks : ' . $e->getMessage());
+            throw new \Exception('Erreur lors de la recherche des tâches : ' . $e->getMessage());
+        }
+    }
+    
+    public function searchTasksSorted(
+        string $query,
+        int $userId,
+        string $sortColumn = 'dateEcheance',
+        string $order = 'ASC'
+    ): array {
+        $allowedColumns = ['titre', 'dateEcheance', 'statut'];
+        if (!in_array($sortColumn, $allowedColumns)) {
+            $sortColumn = 'dateEcheance';
         }
 
-        return $tasks;
+        $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
 
-    } catch (\PDOException $e) {
-        error_log('Erreur dans searchTasks : ' . $e->getMessage());
-        throw new \Exception('Erreur lors de la recherche des tâches : ' . $e->getMessage());
-    }
-}
-public function searchTasksSorted(
-    string $query, 
-    int $userId, 
-    string $sortColumn = 'dateEcheance', 
-    string $order = 'ASC'
-): array {
-    $allowedColumns = ['titre', 'dateEcheance', 'statut'];
-    if (!in_array($sortColumn, $allowedColumns)) {
-        $sortColumn = 'dateEcheance';
-    }
-
-    $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
-
-    try {
-        $sql = "
+        try {
+            $sql = "
             SELECT t.id, t.titre, t.description, t.dateEcheance, t.statut
             FROM tasks t
             INNER JOIN task_users tu ON t.id = tu.taskId
@@ -820,28 +842,27 @@ public function searchTasksSorted(
             LIMIT 50
         ";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
-        $stmt->bindValue(':query', '%' . $query . '%', \PDO::PARAM_STR);
-        $stmt->execute();
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
+            $stmt->bindValue(':query', '%' . $query . '%', \PDO::PARAM_STR);
+            $stmt->execute();
 
-        $tasks = [];
-        while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $tasks[] = new Task(
-                $taskData['titre'],
-                $taskData['description'],
-                [], 
-                $taskData['dateEcheance'],
-                $taskData['statut'],
-                $taskData['id']
-            );
+            $tasks = [];
+            while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                $tasks[] = new Task(
+                    $taskData['titre'],
+                    $taskData['description'],
+                    [],
+                    $taskData['dateEcheance'],
+                    $taskData['statut'],
+                    $taskData['id']
+                );
+            }
+
+            return $tasks;
+        } catch (\PDOException $e) {
+            error_log('Erreur dans searchTasksSorted : ' . $e->getMessage());
+            throw new \Exception('Erreur lors de la recherche des tâches triées : ' . $e->getMessage());
         }
-
-        return $tasks;
-    } catch (\PDOException $e) {
-        error_log('Erreur dans searchTasksSorted : ' . $e->getMessage());
-        throw new \Exception('Erreur lors de la recherche des tâches triées : ' . $e->getMessage());
     }
-}
-
 }

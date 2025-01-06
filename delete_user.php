@@ -51,7 +51,7 @@ if ($userIdToDelete == $_SESSION['user_id']) {
 
 try {
     // Tentative de suppression de l'utilisateur dans la base de données
-    $dbManager->supprimePersonne($userIdToDelete);
+    $dbManager->deleteUser($userIdToDelete);
 
     // Stockage d'un message de succès dans la session
     $_SESSION['successMessage'] = t('user_deleted'); // Utilisation du dictionnaire
