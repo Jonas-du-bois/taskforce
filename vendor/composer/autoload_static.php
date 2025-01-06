@@ -31,10 +31,6 @@ class ComposerStaticInitdbc934b1f082c55a667e1ddd1938125d
             'Psr\\EventDispatcher\\' => 20,
             'Psr\\Container\\' => 14,
         ),
-        'M' => 
-        array (
-            'M521\\Taskforce\\' => 15,
-        ),
         'E' => 
         array (
             'Egulias\\EmailValidator\\' => 23,
@@ -89,13 +85,6 @@ class ComposerStaticInitdbc934b1f082c55a667e1ddd1938125d
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
-        ),
-        'M521\\Taskforce\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src',
-            1 => __DIR__ . '/../..' . '/src/dbManager',
-            2 => __DIR__ . '/../..' . '/src/config',
-            3 => __DIR__ . '/../..' . '/includes',
         ),
         'Egulias\\EmailValidator\\' => 
         array (
