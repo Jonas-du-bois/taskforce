@@ -24,6 +24,7 @@ return array(
     'taskforce_description' => 'TaskForce is a task management app designed to simplify your organization. Stay productive and keep your projects on track.',
     'contact' => 'Contact',
     'all_rights_reserved' => 'All rights reserved',
+    'address' => 'Adress',
 
     // sidebar
     'homeSide' => 'Home',
@@ -70,6 +71,8 @@ return array(
     'selectMultipleUsers' => 'Use Ctrl (or Cmd on Mac) to select multiple users.',
     'addTaskButton' => 'Add Task',
     'errorMessage' => 'Error while adding the task.',
+    'enterTaskTitle' => 'Enter a task title',
+    'describeTask' => 'Describe a task',
 
     // Alerts
     'formErrors' => 'Please correct the errors in the form.',

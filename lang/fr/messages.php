@@ -24,6 +24,7 @@ return array(
     'taskforce_description' => 'TaskForce est une application de gestion des tâches conçue pour simplifier votre organisation. Restez productif et gardez vos projets sur les rails.',
     'contact' => 'Contact',
     'all_rights_reserved' => 'Tous droits réservés',
+    'address' => 'Adresse',
 
     // sidebar
     'homeSide' => 'Accueil',
@@ -70,6 +71,8 @@ return array(
     'selectMultipleUsers' => 'Utilisez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs utilisateurs.',
     'addTaskButton' => 'Ajouter la tâche',
     'errorMessage' => 'Erreur lors de l\'ajout de la tâche.',
+    'enterTaskTitle' => 'Entrez le titre d\'une tâche',
+    'describeTask' => 'Décrivez une tâche',
 
     // Alerts
     'formErrors' => 'Veuillez corriger les erreurs dans le formulaire.',

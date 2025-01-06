@@ -13,10 +13,20 @@
             <div class="col-lg-6 col-md-12 mb-4">
                 <h5 class="text-uppercase"><?php echo t('contact'); ?></h5>
                 <ul class="list-unstyled">
-                    <li>Email : <a href="mailto:support@taskforce.com" class="text-dark">support@taskforce.com</a></li>
-                    <li>Téléphone : +41 78 933 81 41</li>
-                    <li>Adresse : Av. des Sports 20, 1401 Yverdon-les-Bains</li>
+                    <li>
+                        <?= t('email') ?> :
+                        <a href="mailto:support@taskforce.com" class="text-dark">support@taskforce.com</a>
+                    </li>
+                    <li>
+                        <?= t('phone') ?> :
+                        <a href="tel:+41789338141" class="text-dark">+41 78 933 81 41</a>
+                    </li>
+                    <li>
+                        <?= t('address') ?> :
+                        Av. des Sports 20, 1401 Yverdon-les-Bains
+                    </li>
                 </ul>
+
             </div>
         </div>
     </div>

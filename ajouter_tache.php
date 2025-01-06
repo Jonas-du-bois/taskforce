@@ -115,11 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="col-md-6">
                             <label for="titre" class="form-label"><?= t('taskTitle'); ?> <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="titre" name="titre" required
-                                value="<?= htmlspecialchars($titre ?? ''); ?>" placeholder="Entrez le titre de la tâche">
+                                value="<?= htmlspecialchars($titre ?? ''); ?>" placeholder="<?= t('enterTaskTitle') ?>">
                         </div>
 
                         <div class="col-md-6">
-                            <label for="statut" class="form-label"><?= t('statut'); ?> <span class="text-danger">*</span></label>
+                            <label for="statut" class="form-label"><?= t('status'); ?> <span class="text-danger">*</span></label>
                             <select class="form-select" id="statut" name="statut" required>
                                 <option value="a_faire" <?= ($statut === 'a_faire') ? 'selected' : ''; ?>><?= t('todo'); ?></option>
                                 <option value="en_cours" <?= ($statut === 'en_cours') ? 'selected' : ''; ?>><?= t('inProgress'); ?></option>
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <h5 class="text-primary mt-4 mb-3"><?= t('taskDescription'); ?></h5>
                     <div class="mb-3">
-                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Décrivez la tâche..."><?= htmlspecialchars($description ?? ''); ?></textarea>
+                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="<?= t('describeTask') ?>"><?= htmlspecialchars($description ?? ''); ?></textarea>
                     </div>
 
                     <div class="row g-3">
