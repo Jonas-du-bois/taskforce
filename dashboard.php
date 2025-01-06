@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fichier du tableau de bord (dashboard) pour gérer et trier les tâches.
  * Permet également la recherche de tâches et la mise à jour de leur statut.
@@ -72,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
 
             // Écriture en base de données
             if ($dbManager->updateTask($task, $taskId)) {
-                $successMessage = t('taskStatusUpdated'); 
+                $successMessage = t('taskStatusUpdated');
             } else {
                 $errorMessage = t('errorMessageUpdateTask') . $taskId;
             }
@@ -93,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
 ?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - Gestion des Tâches</title>
@@ -112,13 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
 <body>
     <div class="container-fluid" id="loading">
         <div class="row">
-            
+
             <!-- Sidebar -->
             <?php include 'Includes/sidebar.php'; ?>
 
             <!-- Contenu principal -->
             <div class="main-content ms-auto col-md-9 col-lg-10 p-5">
-                
+
                 <!-- Titre et barre de recherche -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><?php echo t('dashboard'); ?></h2>
@@ -160,36 +162,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                                 <tr>
                                     <th scope="col">
                                         <a href="?sort=title&order=<?php echo getSortOrder('title');
-                                        if (!empty($query)) echo '&query=' . urlencode($query); ?>">
+                                                                    if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('title'); ?>
-                                            <i class="bi <?php 
-                                                echo ($sortColumn === 'title')
-                                                    ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
-                                                    : '';
-                                            ?>"></i>
+                                            <i class="bi <?php
+                                                            echo ($sortColumn === 'title')
+                                                                ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
+                                                                : '';
+                                                            ?>"></i>
                                         </a>
                                     </th>
                                     <th scope="col"><?php echo t('descr'); ?></th>
                                     <th scope="col">
                                         <a href="?sort=date_echeance&order=<?php echo getSortOrder('date_echeance');
-                                        if (!empty($query)) echo '&query=' . urlencode($query); ?>">
+                                                                            if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('Date'); ?>
-                                            <i class="bi <?php 
-                                                echo ($sortColumn === 'date_echeance')
-                                                    ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
-                                                    : '';
-                                            ?>"></i>
+                                            <i class="bi <?php
+                                                            echo ($sortColumn === 'date_echeance')
+                                                                ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
+                                                                : '';
+                                                            ?>"></i>
                                         </a>
                                     </th>
                                     <th scope="col">
                                         <a href="?sort=statut&order=<?php echo getSortOrder('statut');
-                                        if (!empty($query)) echo '&query=' . urlencode($query); ?>">
+                                                                    if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('status'); ?>
-                                            <i class="bi <?php 
-                                                echo ($sortColumn === 'statut')
-                                                    ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
-                                                    : '';
-                                            ?>"></i>
+                                            <i class="bi <?php
+                                                            echo ($sortColumn === 'statut')
+                                                                ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
+                                                                : '';
+                                                            ?>"></i>
                                         </a>
                                     </th>
                                     <th scope="col"></th>
@@ -216,14 +218,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                                                         name="statut"
                                                         class="form-select form-select-sm <?php echo getStatusClasses($task->getFormattedStatut()); ?>"
                                                         onchange="this.form.submit()"
-                                                        style="border-width: 2px;"
-                                                    >
-                                                        <?php foreach (['À faire', 'En cours', 'Terminé'] as $status): ?>
+                                                        style="border-width: 2px;">
+                                                        <?php
+                                                        // Tableau des statuts traduits
+                                                        $statuses = [
+                                                            t('todo') => 'À faire',
+                                                            t('inProgress') => 'En cours',
+                                                            t('done') => 'Terminé'
+                                                        ];
+                                                        ?>
+                                                        <?php foreach ($statuses as $translated => $original): ?>
                                                             <option
-                                                                value="<?php echo htmlspecialchars($status); ?>"
-                                                                <?php echo ($status === $task->getFormattedStatut()) ? 'selected' : ''; ?>
-                                                            >
-                                                                <?php echo htmlspecialchars($status); ?>
+                                                                value="<?php echo htmlspecialchars($original); ?>"
+                                                                <?php echo ($original === $task->getFormattedStatut()) ? 'selected' : ''; ?>>
+                                                                <?php echo htmlspecialchars($translated); ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </select>
@@ -243,10 +251,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                    </div> 
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 </body>
+
 </html>
