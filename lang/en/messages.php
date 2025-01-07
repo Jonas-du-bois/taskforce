@@ -61,7 +61,7 @@ return array(
     'userAssignedSuccess' => 'User assigned successfully.',
 
     // Adding tasks
-    'addTask' => 'Add a New Task',
+    'addTask' => 'Add a new task',
     'taskTitle' => 'Title',
     'taskDescription' => 'Description',
     'taskDetails' => 'Details',

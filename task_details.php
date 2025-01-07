@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fichier de modification d'une tâche 
  * -------------------------------------------
@@ -67,11 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Mettre à jour la tâche dans la base de données
         $dbManager->updateTask($task, $taskId);
 
-         // Assigner des utilisateurs à la tâche
-         if (!empty($assignedUsers)) {
+        // Assigner des utilisateurs à la tâche
+        if (!empty($assignedUsers)) {
             $dbManager->assignUsersToTask($taskId, $assignedUsers);
         }
-        
+
         // Désassigner des utilisateurs de la tâche
         if (!empty($unassignedUsers)) {
             $dbManager->unassignUsersFromTask($taskId, $unassignedUsers);
@@ -107,10 +108,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="style/styleSheet.css" rel="stylesheet">
 
     <script>
-       window.addEventListener("beforeunload", () => {
-           localStorage.setItem("previousPage", window.location.href);
-       });
-   </script>
+        // Enregistrer la page précédente dans le localStorage
+        window.addEventListener("load", () => {
+            const currentPage = window.location.href; // URL actuelle
+            const referrer = document.referrer; // URL de la page précédente
+            const previousPage = localStorage.getItem("previousPage");
+
+            // Sauvegarde uniquement si l'utilisateur navigue depuis une autre page
+            if (referrer && !referrer.includes("task_details")) {
+                localStorage.setItem("previousPage", referrer);
+            }
+
+            // Si aucune page précédente enregistrée, définir une valeur par défaut
+            if (!previousPage) {
+                localStorage.setItem("previousPage", "/dashboard.php"); 
+            }
+        });
+
+        // Gérer le bouton de retour pour rediriger vers la page précédente
+        document.addEventListener("DOMContentLoaded", () => {
+            const backButton = document.getElementById("backButton");
+
+            if (backButton) {
+                backButton.addEventListener("click", () => {
+                    const previousPage = localStorage.getItem("previousPage");
+
+                    if (previousPage) {
+                        window.location.href = previousPage;
+                    } else {
+                        alert("Aucune page précédente trouvée.");
+                        // Optionnel : redirection par défaut si aucune page précédente n'est trouvée
+                        window.location.href = "/dashboard.php"; // Remplacez par votre page par défaut
+                    }
+                });
+            }
+        });
+    </script>
 </head>
 
 <body>
@@ -120,113 +153,97 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <main class="container py-4">
             <div class="main-content ms-auto col-md-9 col-lg-10 pt-4">
-                    <h2 class="text-center mb-4">
-                        <i class="fa-solid fa-list-check me-2"></i>
-                        <?php echo t('editTask')?><?php echo htmlspecialchars($task->rendTitre()); ?>
-                    </h2>
-                    <!-- Affichage des messages de feedback -->
-                    <?php if (isset($_SESSION['successMessage'])) : ?>
-                        <div class="alert alert-success">
-                            <i class="fa-solid fa-check-circle me-2"></i>
-                            <?php echo htmlspecialchars($_SESSION['successMessage']); ?>
-                        </div>
-                        <?php unset($_SESSION['successMessage']); ?>
-                    <?php endif; ?>
-                    <?php if (isset($_SESSION['errorMessage'])) : ?>
-                        <div class="alert alert-danger">
-                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                            <?php echo htmlspecialchars($_SESSION['errorMessage']); ?>
-                        </div>
-                        <?php unset($_SESSION['errorMessage']); ?>
-                    <?php endif; ?>
-                    <!-- Formulaire de modification -->
-                    <div class="shadow p-4 rounded bg-white">
-                        <form action="task_details.php?task_id=<?php echo $taskId; ?>" method="POST" class="needs-validation">
-                            <div class="mb-3">
-                                <label for="title" class="text-primary mb-3 fs-5"><?php echo t('taskTitle') ?></label>
-                                <input type="text" id="title" name="title" class="form-control" value="<?php echo htmlspecialchars($task->rendTitre()); ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="description" class="text-primary mb-3 fs-5"><?php echo t('taskDescription') ?></label>
-                                <textarea id="description" name="description" class="form-control" rows="4"><?php echo htmlspecialchars($task->rendDescription()); ?></textarea>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="deadline" class="text-primary mb-3 fs-5"><?php echo t('dueDate') ?></label>
-                                    <input type="date" id="deadline" name="deadline" class="form-control" value="<?php echo $task->rendDateEcheance(); ?>">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="status" class="text-primary mb-3 fs-5"><?php echo t('taskStatusLabel') ?></label>
-                                    <select id="status" name="status" class="form-select">
-                                        <option value="a_faire" <?php echo $task->rendStatut() == 'a_faire' ? 'selected' : ''; ?>><?echo t('todo')?></option>
-                                        <option value="en_cours" <?php echo $task->rendStatut() == 'en_cours' ? 'selected' : ''; ?>><?echo t('inProgress')?></option>
-                                        <option value="termine" <?php echo $task->rendStatut() == 'termine' ? 'selected' : ''; ?>><?echo t('done')?></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <!-- Colonne des utilisateurs à assigner -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="assigned_users" class="text-primary mb-3 fs-5"><?= t('assignUsersLabel'); ?></label>
-                                    <select multiple id="assigned_users" name="assigned_users[]" class="form-select">
-                                        <?php
-                                        $unassignedUsers = $dbManager->getUsersNotAssignedToTask($taskId);
-                                        foreach ($unassignedUsers as $user) {
-                                            echo "<option value='" . $user['id'] . "'>" . htmlspecialchars($user['nom']) . " " . htmlspecialchars($user['prenom']) . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <!-- Colonne des utilisateurs à désassigner -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="unassigned_users" class="text-primary mb-3 fs-5"><?= t('unassignUsersLabel'); ?></label>
-                                    <select multiple id="unassigned_users" name="unassigned_users[]" class="form-select">
-                                        <?php
-                                        $assignedUsers = $dbManager->getUsersAssignedToTask($taskId);
-                                        foreach ($assignedUsers as $user) {
-                                            echo "<option value='" . $user['id'] . "'>" . htmlspecialchars($user['nom']) . " " . htmlspecialchars($user['prenom']) . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa-solid fa-floppy-disk me-2"></i><? echo t('updateButton')?>
-                                </button>
-                                <!--<a id="backButton" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i> <? echo t('backButton')?></a>-->
-                            </div>
-                        </form>
+                <h2 class="text-center mb-4">
+                    <i class="fa-solid fa-list-check me-2"></i>
+                    <?php echo t('editTask') ?><?php echo htmlspecialchars($task->rendTitre()); ?>
+                </h2>
+                <!-- Affichage des messages de feedback -->
+                <?php if (isset($_SESSION['successMessage'])) : ?>
+                    <div class="alert alert-success">
+                        <i class="fa-solid fa-check-circle me-2"></i>
+                        <?php echo htmlspecialchars($_SESSION['successMessage']); ?>
                     </div>
-                    <!-- Bouton de suppression -->
-                    <form method="POST" action="delete_task.php?task_id=<?php echo $taskId; ?>" class="mt-4 p-3">
-                        <button type="submit" name="delete_task" class="btn btn-danger w-100">
-                            <i class="fa-solid fa-trash me-2"></i> <? echo t('deleteButton')?>
-                        </button>
+                    <?php unset($_SESSION['successMessage']); ?>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['errorMessage'])) : ?>
+                    <div class="alert alert-danger">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        <?php echo htmlspecialchars($_SESSION['errorMessage']); ?>
+                    </div>
+                    <?php unset($_SESSION['errorMessage']); ?>
+                <?php endif; ?>
+                <!-- Formulaire de modification -->
+                <div class="shadow p-4 rounded bg-white">
+                    <form action="task_details.php?task_id=<?php echo $taskId; ?>" method="POST" class="needs-validation">
+                        <div class="mb-3">
+                            <label for="title" class="text-primary mb-3 fs-5"><?php echo t('taskTitle') ?></label>
+                            <input type="text" id="title" name="title" class="form-control" value="<?php echo htmlspecialchars($task->rendTitre()); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="text-primary mb-3 fs-5"><?php echo t('taskDescription') ?></label>
+                            <textarea id="description" name="description" class="form-control" rows="4"><?php echo htmlspecialchars($task->rendDescription()); ?></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="deadline" class="text-primary mb-3 fs-5"><?php echo t('dueDate') ?></label>
+                                <input type="date" id="deadline" name="deadline" class="form-control" value="<?php echo $task->rendDateEcheance(); ?>">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="text-primary mb-3 fs-5"><?php echo t('taskStatusLabel') ?></label>
+                                <select id="status" name="status" class="form-select">
+                                    <option value="a_faire" <?php echo $task->rendStatut() == 'a_faire' ? 'selected' : ''; ?>><? echo t('todo') ?></option>
+                                    <option value="en_cours" <?php echo $task->rendStatut() == 'en_cours' ? 'selected' : ''; ?>><? echo t('inProgress') ?></option>
+                                    <option value="termine" <?php echo $task->rendStatut() == 'termine' ? 'selected' : ''; ?>><? echo t('done') ?></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Colonne des utilisateurs à assigner -->
+                            <div class="col-md-6 mb-3">
+                                <label for="assigned_users" class="text-primary mb-3 fs-5"><?= t('assignUsersLabel'); ?></label>
+                                <select multiple id="assigned_users" name="assigned_users[]" class="form-select">
+                                    <?php
+                                    $unassignedUsers = $dbManager->getUsersNotAssignedToTask($taskId);
+                                    foreach ($unassignedUsers as $user) {
+                                        echo "<option value='" . $user['id'] . "'>" . htmlspecialchars($user['nom']) . " " . htmlspecialchars($user['prenom']) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <!-- Colonne des utilisateurs à désassigner -->
+                            <div class="col-md-6 mb-3">
+                                <label for="unassigned_users" class="text-primary mb-3 fs-5"><?= t('unassignUsersLabel'); ?></label>
+                                <select multiple id="unassigned_users" name="unassigned_users[]" class="form-select">
+                                    <?php
+                                    $assignedUsers = $dbManager->getUsersAssignedToTask($taskId);
+                                    foreach ($assignedUsers as $user) {
+                                        echo "<option value='" . $user['id'] . "'>" . htmlspecialchars($user['nom']) . " " . htmlspecialchars($user['prenom']) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-floppy-disk me-2"></i><? echo t('updateButton') ?>
+                            </button>
+                            <a id="backButton" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i> <? echo t('backButton') ?></a>
+                        </div>
                     </form>
                 </div>
-            </main>
-        </div>
+                <!-- Bouton de suppression -->
+                <form method="POST" action="delete_task.php?task_id=<?php echo $taskId; ?>" class="mt-4 p-3">
+                    <button type="submit" name="delete_task" class="btn btn-danger w-100">
+                        <i class="fa-solid fa-trash me-2"></i> <? echo t('deleteButton') ?>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-       const backButton = document.getElementById("backButton");
-       const errorMessage = document.getElementById("errorMessage");
-
-       // Ajout de l'événement "click" au bouton
-       backButton.addEventListener("click", () => {
-           const previousPage = localStorage.getItem("previousPage");
-           if (previousPage) {
-               // Si une URL précédente est disponible, redirection
-               window.location.href = previousPage;
-           } else {
-               // Sinon, affichage d'un message d'erreur
-               errorMessage.style.display = "block";
-           }
-       });
-   </script>
 </body>
 
 </html>
