@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                             <thead>
                                 <tr>
                                     <th scope="col">
-                                        <a href="?sort=title&order=<?php echo getSortOrder('title');
+                                        <a href="?sort=titre&order=<?php echo getSortOrder('title');
                                                                     if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('title'); ?>
                                             <i class="bi <?php
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                                     </th>
                                     <th scope="col"><?php echo t('descr'); ?></th>
                                     <th scope="col">
-                                        <a href="?sort=date_echeance&order=<?php echo getSortOrder('date_echeance');
+                                        <a href="?sort=dateEcheance&order=<?php echo getSortOrder('date_echeance');
                                                                             if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('Date'); ?>
                                             <i class="bi <?php
