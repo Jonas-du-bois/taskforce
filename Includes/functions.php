@@ -74,4 +74,10 @@ function getSortOrder(string $column): string
     // Par défaut, on trie par ordre croissant
     return 'ASC'; // Ordre par défaut
 }
+
+function isDateEcheanceDepassee($dateEcheance) {
+    $currentDate = new DateTime();
+    $echeanceDate = new DateTime($dateEcheance);
+    return $echeanceDate < $currentDate;
+}
 ?>

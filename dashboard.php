@@ -161,11 +161,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                             <thead>
                                 <tr>
                                     <th scope="col">
-                                        <a href="?sort=titre&order=<?php echo getSortOrder('title');
+                                        <a href="?sort=titre&order=<?php echo getSortOrder('titre');
                                                                     if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('title'); ?>
                                             <i class="bi <?php
-                                                            echo ($sortColumn === 'title')
+                                                            echo ($sortColumn === 'titre')
                                                                 ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
                                                                 : '';
                                                             ?>"></i>
@@ -173,11 +173,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                                     </th>
                                     <th scope="col"><?php echo t('descr'); ?></th>
                                     <th scope="col">
-                                        <a href="?sort=dateEcheance&order=<?php echo getSortOrder('date_echeance');
+                                        <a href="?sort=dateEcheance&order=<?php echo getSortOrder('dateEcheance');
                                                                             if (!empty($query)) echo '&query=' . urlencode($query); ?>">
                                             <?php echo t('Date'); ?>
                                             <i class="bi <?php
-                                                            echo ($sortColumn === 'date_echeance')
+                                                            echo ($sortColumn === 'dateEcheance')
                                                                 ? (($order === 'ASC') ? 'bi-arrow-up' : 'bi-arrow-down')
                                                                 : '';
                                                             ?>"></i>
@@ -206,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
                                         <td class="text-truncate" style="max-width: 300px;">
                                             <?php echo htmlspecialchars($task->rendDescription()); ?>
                                         </td>
-                                        <td>
+                                        <td class="<?php echo isDateEcheanceDepassee($task->rendDateEcheance()) ? 'text-danger' : ''; ?>">
                                             <?php echo htmlspecialchars($task->getFormattedDateEcheance()); ?>
                                         </td>
                                         <td>
