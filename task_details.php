@@ -105,6 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Feuille de style personnalisée -->
     <link href="style/styleSheet.css" rel="stylesheet">
+
+    <script>
+       window.addEventListener("beforeunload", () => {
+           localStorage.setItem("previousPage", window.location.href);
+       });
+   </script>
 </head>
 
 <body>
@@ -188,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa-solid fa-floppy-disk me-2"></i><? echo t('updateButton')?>
                                 </button>
-                                <a id="backButton" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i> <? echo t('backButton')?></a>
+                                <!--<a id="backButton" class="btn btn-secondary"><i class="fa-solid fa-arrow-left me-2"></i> <? echo t('backButton')?></a>-->
                             </div>
                         </form>
                     </div>
@@ -206,20 +212,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const backButton = document.getElementById("backButton");
-        const errorMessage = document.getElementById("errorMessage");
+       const backButton = document.getElementById("backButton");
+       const errorMessage = document.getElementById("errorMessage");
 
-        // Ajout de l'événement "click" au bouton
-        backButton.addEventListener("click", () => {
-            if (document.referrer) {
-                // Si un lien précédent est disponible, redirection
-                window.location.href = document.referrer;
-            } else {
-                // Sinon, affichage d'un message d'erreur
-                errorMessage.style.display = "block";
-            }
-        });
-    </script>
+       // Ajout de l'événement "click" au bouton
+       backButton.addEventListener("click", () => {
+           const previousPage = localStorage.getItem("previousPage");
+           if (previousPage) {
+               // Si une URL précédente est disponible, redirection
+               window.location.href = previousPage;
+           } else {
+               // Sinon, affichage d'un message d'erreur
+               errorMessage.style.display = "block";
+           }
+       });
+   </script>
 </body>
 
 </html>

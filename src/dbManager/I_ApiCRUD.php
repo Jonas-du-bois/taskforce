@@ -2,114 +2,190 @@
 
 namespace M521\Taskforce\dbManager;
 
-interface I_ApiCRUD {
-    public function creeTable(): bool;
-
-    //----------Users----------
+interface I_ApiCRUD
+{
+    // ---------- Méthodes pour les utilisateurs ----------
 
     /**
-     * Ajoute un utilisateur dans la base de données.
-     * @param Users $users Instance de la classe Users à insérer.
-     * @return int Identifiant de l'utilisateur inséré.
+     * Ajoute un nouvel utilisateur.
+     * @param Users $user L'objet utilisateur à ajouter.
+     * @return int L'ID de l'utilisateur ajouté.
      */
-    public function addUser(Users $users): int;
+    public function addUser(Users $user): int;
 
     /**
-     * Retourne une liste d'utilisateurs filtrée par nom.
-     * @param string $nom Nom à rechercher.
-     * @return array Tableau des utilisateurs correspondant.
-     */
-    public function getUser(string $nom): array;
-
-    /**
-     * Modifie les données d'un utilisateur spécifique.
-     * @param int $id Identifiant de l'utilisateur.
-     * @param Users $users Instance contenant les nouvelles données.
-     * @return bool Retourne true si la modification a réussi, sinon false.
+     * Met à jour un utilisateur existant.
+     * @param int $id L'ID de l'utilisateur à mettre à jour.
+     * @param Users $user L'objet utilisateur avec les nouvelles données.
+     * @return bool True si la mise à jour a réussi, false sinon.
      */
     public function updateUser(int $id, Users $user): bool;
 
     /**
-     * Supprime un utilisateur.
-     * @param int $id Identifiant de l'utilisateur.
-     * @return bool Retourne true si la suppression a réussi, sinon false.
+     * Récupère un utilisateur par son email.
+     * @param string $email L'email de l'utilisateur à récupérer.
+     * @return array Un tableau d'objets Users correspondant aux utilisateurs trouvés.
+     */
+    public function getUser(string $email): array;
+
+    /**
+     * Récupère un utilisateur par son ID.
+     * @param int $userId L'ID de l'utilisateur à récupérer.
+     * @return array Un tableau d'objets Users correspondant aux utilisateurs trouvés.
+     */
+    public function getUserById(int $userId): array;
+
+    /**
+     * Récupère tous les utilisateurs.
+     * @return array Un tableau d'objets Users correspondant aux utilisateurs trouvés.
+     */
+    public function getAllUsers(): array;
+
+    /**
+     * Supprime un utilisateur par son ID.
+     * @param int $id L'ID de l'utilisateur à supprimer.
+     * @return bool True si la suppression a réussi, false sinon.
      */
     public function deleteUser(int $id): bool;
 
     /**
-     * Vérifie si les identifiants d'un utilisateur sont valides.
-     * @param string $email Email de l'utilisateur.
-     * @param string $motDePasse Mot de passe de l'utilisateur.
-     * @return string Retourne un token si les identifiants sont valides.
+     * Vérifie les identifiants d'un utilisateur.
+     * @param string $email L'email de l'utilisateur.
+     * @param string $motDePasse Le mot de passe de l'utilisateur.
+     * @return string Le résultat de la vérification ('success', 'wrong_password', 'email_not_found', 'not_confirmed').
      */
     public function verifyCredentials(string $email, string $motDePasse): string;
 
     /**
      * Compte le nombre total d'utilisateurs.
-     * @return int Nombre d'utilisateurs.
+     * @return int Le nombre total d'utilisateurs.
      */
     public function countUsers(): int;
 
     /**
-     * Récupère un utilisateur par son token d'authentification.
-     * @param string $token Token de l'utilisateur.
-     * @return Users|null Retourne une instance de Users ou null si aucun utilisateur n'est trouvé.
+     * Récupère un utilisateur par son token.
+     * @param string $token Le token de l'utilisateur.
+     * @return array|null Un tableau d'objets Users correspondant à l'utilisateur trouvé ou null si aucun utilisateur n'est trouvé.
      */
     public function getUserByToken($token): ?array;
 
     /**
      * Confirme l'inscription d'un utilisateur.
-     * @param int $userId Identifiant de l'utilisateur.
-     * @return bool Retourne true si la confirmation a réussi, sinon false.
+     * @param int $userId L'ID de l'utilisateur à confirmer.
+     * @return bool True si la confirmation a réussi, false sinon.
      */
     public function confirmRegistration(int $userId): bool;
 
-    //----------Tasks----------
+    // ---------- Méthodes pour les tâches ----------
 
     /**
-     * Ajoute une tâche dans la base de données.
-     * @param Task $tasks Instance de la classe Task à insérer.
-     * @return int Identifiant de la tâche insérée.
+     * Crée une nouvelle tâche.
+     * @param Task $task L'objet tâche à créer.
+     * @return int L'ID de la tâche créée.
      */
     public function createTask(Task $task): int;
 
     /**
-     * Associe des utilisateurs à une tâche dans la table de jointure.
-     * @param int $taskId ID de la tâche
-     * @param array $userIds Liste des IDs des utilisateurs
-     * @throws \Exception
+     * Associe des utilisateurs à une tâche.
+     * @param int $taskId L'ID de la tâche.
+     * @param array $userIds Un tableau des IDs des utilisateurs à associer.
      */
     public function assignUsersToTask(int $taskId, array $userIds): void;
 
     /**
-     * Récupère une tâche en fonction de son ID.
-     * @param int $taskId ID de la tâche
-     * @return Task Objet Task récupéré
-     * @throws \Exception Si la tâche n'existe pas
+     * Désassocie des utilisateurs d'une tâche.
+     * @param int $taskId L'ID de la tâche.
+     * @param array $userIds Un tableau des IDs des utilisateurs à désassocier.
+     */
+    public function unassignUsersFromTask(int $taskId, array $userIds): void;
+
+    /**
+     * Récupère une tâche par son ID.
+     * @param int $taskId L'ID de la tâche à récupérer.
+     * @return Task L'objet tâche correspondant à l'ID fourni.
      */
     public function getTaskById(int $taskId): Task;
 
     /**
      * Met à jour une tâche existante.
-     * @param Task $task Objet Task avec les nouvelles données
-     * @throws \Exception Si la mise à jour échoue
+     * @param Task $task L'objet tâche avec les nouvelles données.
+     * @param int $taskId L'ID de la tâche à mettre à jour.
+     * @return bool True si la mise à jour a réussi, false sinon.
      */
     public function updateTask(Task $task, int $taskId);
 
     /**
-     * Supprime une tâche de la base de données.
-     * @param int $taskId ID de la tâche à supprimer
-     * @throws \Exception Si la suppression échoue
+     * Supprime une tâche par son ID.
+     * @param int $taskId L'ID de la tâche à supprimer.
      */
     public function deleteTask(int $taskId): void;
 
     /**
      * Récupère toutes les tâches.
-     * @return Task[] Tableau d'objets Task
-     * @throws \Exception
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
      */
     public function getAllTasks(): array;
 
+    /**
+     * Récupère toutes les tâches associées à un utilisateur donné.
+     * @param int $userId L'ID de l'utilisateur.
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     */
+    public function getTasksByUserId(int $userId): array;
+
+    /**
+     * Récupère les tâches associées à un utilisateur selon leur statut.
+     * @param int $userId L'ID de l'utilisateur.
+     * @param string $status Le statut des tâches (à faire, en cours, terminé).
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     */
     public function getTasksByUserIdAndStatus($userId, $status);
 
+    /**
+     * Récupère les tâches partagées d'un utilisateur.
+     * @param int $userId L'ID de l'utilisateur.
+     * @return array Un tableau contenant les informations des tâches partagées.
+     */
+    public function getTasksSharedByUserId(int $userId): array;
+
+    /**
+     * Récupère les tâches d'un utilisateur donné et les trie selon une colonne spécifiée.
+     * @param int $userId L'ID de l'utilisateur.
+     * @param string $sortColumn La colonne par laquelle trier les résultats.
+     * @param string $order L'ordre de tri (ASC ou DESC).
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     */
+    public function getTasksByUserIdSorted(int $userId, string $sortColumn = 'titre', string $order = 'ASC'): array;
+
+    /**
+     * Récupère les utilisateurs non assignés à une tâche donnée.
+     * @param int $taskId L'ID de la tâche.
+     * @return array Un tableau associatif contenant les informations des utilisateurs non assignés à la tâche.
+     */
+    public function getUsersNotAssignedToTask(int $taskId): array;
+
+    /**
+     * Récupère les utilisateurs assignés à une tâche donnée.
+     * @param int $taskId L'ID de la tâche.
+     * @return array Un tableau associatif contenant les informations des utilisateurs assignés à la tâche.
+     */
+    public function getUsersAssignedToTask(int $taskId): array;
+
+    /**
+     * Recherche des tâches pour un utilisateur donné.
+     * @param string $query La chaîne de recherche pour filtrer les tâches par titre ou description.
+     * @param int $userId L'ID de l'utilisateur.
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     */
+    public function searchTasks(string $query, int $userId): array;
+
+    /**
+     * Recherche des tâches triées pour un utilisateur donné.
+     * @param string $query La chaîne de recherche pour filtrer les tâches par titre ou description.
+     * @param int $userId L'ID de l'utilisateur.
+     * @param string $sortColumn La colonne par laquelle trier les résultats.
+     * @param string $order L'ordre de tri (ASC ou DESC).
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     */
+    public function searchTasksSorted(string $query, int $userId, string $sortColumn = 'dateEcheance', string $order = 'ASC'): array;
 }

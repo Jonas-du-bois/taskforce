@@ -668,58 +668,79 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
+  /**
+ * Récupère les tâches d'un utilisateur donné et les trie selon une colonne spécifiée.
+ *
+ * Cette fonction récupère les tâches associées à un utilisateur spécifique
+ * et les trie selon une colonne spécifiée.
+ *
+ * @param int $userId L'ID de l'utilisateur pour lequel les tâches doivent être récupérées.
+ * @param string $sortColumn La colonne par laquelle trier les résultats. Les valeurs autorisées sont 'titre', 'dateEcheance', et 'statut'. Par défaut 'titre'.
+ * @param string $order L'ordre de tri, soit 'ASC' pour ascendant, soit 'DESC' pour descendant. Par défaut 'ASC'.
+ * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+ * @throws \Exception Si une erreur se produit lors de l'exécution de la requête SQL.
+ */
+public function getTasksByUserIdSorted(int $userId, string $sortColumn = 'titre', string $order = 'ASC'): array
+{
+    $validSortColumns = ['titre', 'dateEcheance', 'statut'];
+    $validOrders = ['ASC', 'DESC'];
 
-    public function getTasksByUserIdSorted(int $userId, string $sortColumn = 'titre', string $order = 'ASC'): array
-    {
-        $validSortColumns = ['titre', 'dateEcheance', 'statut'];
-        $validOrders = ['ASC', 'DESC'];
-
-        // Validation des paramètres de tri
-        if (!in_array($sortColumn, $validSortColumns)) {
-            $sortColumn = 'titre';
-        }
-        if (!in_array($order, $validOrders)) {
-            $order = 'ASC';
-        }
-
-        try {
-            // Construire la requête SQL
-            $query = "
-            SELECT t.id, t.titre, t.description, t.dateEcheance, t.statut, t.createdAt
-            FROM tasks t
-            JOIN task_users tu ON t.id = tu.taskId
-            WHERE tu.userId = :userId
-            ORDER BY $sortColumn $order
-        ";
-
-            $stmt = $this->db->prepare($query);
-            $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
-            $stmt->execute();
-
-            $tasks = [];
-            while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                // Récupération des IDs des utilisateurs associés
-                $stmtUsers = $this->db->prepare("SELECT userId FROM task_users WHERE taskId = :taskId");
-                $stmtUsers->bindValue(':taskId', $taskData['id']);
-                $stmtUsers->execute();
-                $userIds = $stmtUsers->fetchAll(\PDO::FETCH_COLUMN);
-
-                // Création de l'objet Task
-                $tasks[] = new Task(
-                    $taskData['titre'],
-                    $taskData['description'],
-                    $userIds,
-                    $taskData['dateEcheance'],
-                    $taskData['statut'],
-                    $taskData['id']
-                );
-            }
-
-            return $tasks;
-        } catch (\PDOException $e) {
-            throw new \Exception('Erreur lors de la récupération des tâches triées : ' . $e->getMessage());
-        }
+    // Validation des paramètres de tri
+    if (!in_array($sortColumn, $validSortColumns)) {
+        $sortColumn = 'titre';
     }
+    if (!in_array($order, $validOrders)) {
+        $order = 'ASC';
+    }
+
+    try {
+        // Construire la requête SQL
+        $query = "
+        SELECT t.id, t.titre, t.description, t.dateEcheance, t.statut, t.createdAt
+        FROM tasks t
+        JOIN task_users tu ON t.id = tu.taskId
+        WHERE tu.userId = :userId
+        ORDER BY $sortColumn $order
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':userId', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        $tasks = [];
+        while ($taskData = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            // Récupération des IDs des utilisateurs associés
+            $stmtUsers = $this->db->prepare("SELECT userId FROM task_users WHERE taskId = :taskId");
+            $stmtUsers->bindValue(':taskId', $taskData['id']);
+            $stmtUsers->execute();
+            $userIds = $stmtUsers->fetchAll(\PDO::FETCH_COLUMN);
+
+            // Création de l'objet Task
+            $tasks[] = new Task(
+                $taskData['titre'],
+                $taskData['description'],
+                $userIds,
+                $taskData['dateEcheance'],
+                $taskData['statut'],
+                $taskData['id']
+            );
+        }
+
+        return $tasks;
+    } catch (\PDOException $e) {
+        throw new \Exception('Erreur lors de la récupération des tâches triées : ' . $e->getMessage());
+    }
+}
+
+    /**
+     * Récupère les utilisateurs non assignés à une tâche donnée.
+     *
+     * Cette fonction récupère les informations des utilisateurs qui ne sont pas assignés à une tâche spécifique.
+     *
+     * @param int $taskId L'ID de la tâche pour laquelle les utilisateurs doivent être récupérés.
+     * @return array Un tableau associatif contenant les informations des utilisateurs non assignés à la tâche.
+     * @throws \Exception Si une erreur se produit lors de l'exécution de la requête SQL.
+     */
     public function getUsersNotAssignedToTask(int $taskId): array
     {
         try {
@@ -753,6 +774,15 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
+    /**
+     * Récupère les utilisateurs assignés à une tâche donnée.
+     *
+     * Cette fonction récupère les informations des utilisateurs assignés à une tâche spécifique.
+     *
+     * @param int $taskId L'ID de la tâche pour laquelle les utilisateurs doivent être récupérés.
+     * @return array Un tableau associatif contenant les informations des utilisateurs assignés à la tâche.
+     * @throws \Exception Si une erreur se produit lors de l'exécution de la requête SQL.
+     */
     public function getUsersAssignedToTask(int $taskId): array
     {
         try {
@@ -783,6 +813,17 @@ class DbManagerCRUD implements I_ApiCRUD
         }
     }
 
+    /**
+     * Recherche des tâches pour un utilisateur donné.
+     *
+     * Cette fonction recherche les tâches associées à un utilisateur spécifique
+     * en fonction d'une requête de recherche.
+     *
+     * @param string $query La chaîne de recherche à utiliser pour filtrer les tâches par titre ou description.
+     * @param int $userId L'ID de l'utilisateur pour lequel les tâches doivent être recherchées.
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     * @throws \Exception Si une erreur se produit lors de l'exécution de la requête SQL.
+     */
     public function searchTasks(string $query, $userId): array
     {
         try {
@@ -817,7 +858,20 @@ class DbManagerCRUD implements I_ApiCRUD
             throw new \Exception('Erreur lors de la recherche des tâches : ' . $e->getMessage());
         }
     }
-    
+
+    /**
+     * Recherche des tâches triées pour un utilisateur donné.
+     *
+     * Cette fonction recherche les tâches associées à un utilisateur spécifique
+     * en fonction d'une requête de recherche et les trie selon une colonne spécifiée.
+     *
+     * @param string $query La chaîne de recherche à utiliser pour filtrer les tâches par titre ou description.
+     * @param int $userId L'ID de l'utilisateur pour lequel les tâches doivent être recherchées.
+     * @param string $sortColumn La colonne par laquelle trier les résultats. Les valeurs autorisées sont 'titre', 'dateEcheance', et 'statut'. Par défaut 'dateEcheance'.
+     * @param string $order L'ordre de tri, soit 'ASC' pour ascendant, soit 'DESC' pour descendant. Par défaut 'ASC'.
+     * @return array Un tableau d'objets Task correspondant aux tâches trouvées.
+     * @throws \Exception Si une erreur se produit lors de l'exécution de la requête SQL.
+     */
     public function searchTasksSorted(
         string $query,
         int $userId,

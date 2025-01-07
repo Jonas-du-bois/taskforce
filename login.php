@@ -91,7 +91,7 @@ $dbUser = new DbManagerCRUD();
                                 $_SESSION['email_user'] = $email; // Stockage de l'email dans la session
 
                                 // Redirection vers la page d'accueil après connexion
-                                header('Location: index.php');
+                                header('Location: dashboard.php');
                                 exit();
                             } elseif ($loginStatus === 'not_confirmed') {
                                 echo "<div class='alert alert-warning'>" . t('email_not_confirmed_error'). "</div>";

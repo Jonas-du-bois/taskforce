@@ -11,5 +11,11 @@
             "name": "JDB"
         }
     ],
-    "require": {}
+    "require": {
+        "symfony/mailer": "^7.2",
+        "symfony/mime": "^7.2",
+        "symfony/event-dispatcher": "^7.2",
+        "symfony/polyfill-mbstring": "^1.31",
+        "symfony/polyfill-intl-normalizer": "^1.31"
+    }
 }
