@@ -137,8 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         window.location.href = previousPage;
                     } else {
                         alert("Aucune page précédente trouvée.");
-                        // Optionnel : redirection par défaut si aucune page précédente n'est trouvée
-                        window.location.href = "/dashboard.php"; // Remplacez par votre page par défaut
+                        //redirection par défaut si aucune page précédente n'est trouvée
+                        window.location.href = "/dashboard.php"; 
                     }
                 });
             }

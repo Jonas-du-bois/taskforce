@@ -45,14 +45,25 @@ $order      = $_GET['order'] ?? 'ASC';
 // Paramètre de recherche (query)
 $query = $_GET['query'] ?? '';
 
-// 1. Chargement des tâches : si $query n'est pas vide => recherche + tri, sinon liste complète + tri
+if (!empty($query)) {
+    if (stripos($query, 'rickroll') !== false) {
+        // Rickroll détecté : on joue la musique de Rick Astley 
+        echo '<audio controls autoplay style="display:none;">
+                <source src="audio/never_gonna_give_you_up.mp3" type="audio/mpeg">
+              </audio>';
+        // Ajout du message de Rickroll dans le message d'erreur
+        $errorMessage = 'Félicitations ! Vous avez été Rickrolled ! 🎶';
+    }
+}
+
+// 2. Chargement des tâches : si $query n'est pas vide => recherche + tri, sinon liste complète + tri
 if (!empty($query)) {
     $tasks = $dbManager->searchTasksSorted($query, $userId, $sortColumn, $order);
 } else {
     $tasks = $dbManager->getTasksByUserIdSorted($userId, $sortColumn, $order);
 }
 
-// 2. Mise à jour du statut des tâches via formulaire POST
+// 3. Mise à jour du statut des tâches via formulaire POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['statut'])) {
     $taskId          = intval($_POST['task_id']);
     $formattedStatus = $_POST['statut'];
@@ -82,13 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'], $_POST['st
         }
     } else {
         $errorMessage = t('invalidStatusSelected');
-    }
-
-    // Après la mise à jour, on recharge la liste (recherche ou liste complète)
-    if (!empty($query)) {
-        $tasks = $dbManager->searchTasksSorted($query, $userId, $sortColumn, $order);
-    } else {
-        $tasks = $dbManager->getTasksByUserIdSorted($userId, $sortColumn, $order);
     }
 }
 ?>
